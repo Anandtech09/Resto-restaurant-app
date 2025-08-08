@@ -17,11 +17,11 @@ export const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems: cart, clearCart } = useCart();
   const [userId, setUserId] = useState<string | null>(null);
-
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [creditCardDetails, setCreditCardDetails] = useState({ number: '', expiry: '', cvv: '' });
+  const [paypalEmail, setPaypalEmail] = useState('');
   const [deliveryType, setDeliveryType] = useState('immediate');
   const [scheduledTime, setScheduledTime] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
@@ -71,6 +71,7 @@ export const Checkout = () => {
         setAddresses(data);
         const defaultAddress = data.find(addr => addr.is_default);
         if (defaultAddress) setSelectedAddress(defaultAddress.id);
+        setPaypalEmail(defaultAddress?.label || '');
       }
     } catch (error) {
       console.error('Error fetching addresses:', error);
@@ -318,7 +319,7 @@ export const Checkout = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <RadioGroup value={paymentMethod} onValueChange={(value: 'card' | 'cod') => setPaymentMethod(value)}>
+                  <RadioGroup value={paymentMethod} onValueChange={(value: 'card' | 'cod' | 'paypal') => setPaymentMethod(value)}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="card" id="card" />
                       <Label htmlFor="card">Credit/Debit Card</Label>
@@ -326,6 +327,10 @@ export const Checkout = () => {
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="cod" id="cod" />
                       <Label htmlFor="cod">Cash on Delivery</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="paypal" id="paypal" />
+                      <Label htmlFor="paypal">Paypal</Label>
                     </div>
                   </RadioGroup>
 
@@ -361,6 +366,18 @@ export const Checkout = () => {
                           onChange={(e) => setCreditCardDetails({ ...creditCardDetails, cvv: e.target.value })}
                         />
                       </div>
+                    </div>
+                  )}
+                  {paymentMethod === 'paypal' && (
+                    <div className="mt-4">
+                      <Label htmlFor="paypal-email">Email</Label>
+                      <Input
+                        id="paypal-email"
+                        type="email"
+                        placeholder="email@example.com"
+                        value={paypalEmail}
+                        onChange={(e) => setPaypalEmail(e.target.value)}
+                      />
                     </div>
                   )}
                 </CardContent>
@@ -491,3 +508,4 @@ export const Checkout = () => {
     </div>
   );
 };
+
