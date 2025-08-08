@@ -2,8 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const url = import.meta.env.SUPABASE_URL;
-const key = import.meta.env.SUPABASE_PUBLISHABLE_KEY;
+const url = import.meta.env.VITE_SUPABASE_URL || '';
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+
+if (!url || !key) {
+  throw new Error('Both SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are required');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
@@ -15,3 +19,4 @@ export const supabase = createClient<Database>(url, key, {
     autoRefreshToken: true,
   }
 });
+
