@@ -86,17 +86,14 @@ export const Home = () => {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative flex items-center justify-center min-h-[60vh] text-black overflow-hidden">
-          {bannerSettings?.image_url && (
-            <div className="absolute inset-0">
-              <img
-                src={bannerSettings.image_url}
-                alt={bannerSettings.title || "Delicious food background"}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
-            </div>
-          )}
+        <section
+          className="relative flex items-center justify-center min-h-[60vh] text-black overflow-hidden"
+          style={{
+            backgroundImage: "url('https://static.vecteezy.com/system/resources/thumbnails/050/679/260/small_2x/fresh-vegetables-and-fruits-arranged-on-a-vibrant-orange-backdrop-creating-a-colorful-culinary-display-in-a-kitchen-setting-photo.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           {/* FIX 1: Wrapped content in a single container div for proper centering. */}
           <div className="relative z-10 text-center container mx-auto px-4">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg text-primary-foreground">
@@ -107,7 +104,7 @@ export const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to={bannerSettings?.button_link || "/menu"}>
-                <Button size="lg" className="btn-food px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="border-white text-white bg-white/10 px-8 py-4 text-lg">
                   {bannerSettings?.button_text || 'Order Now'}
                 </Button>
               </Link>
@@ -120,6 +117,18 @@ export const Home = () => {
           </div>
         </section>
 
+        {/* Banner Image */}
+        <section className="mt-8 md:mt-16">
+          {bannerSettings?.image_url && (
+            <div className="relative w-full h-[420px] md:h-[600px] flex justify-center">
+              <img
+                src={bannerSettings.image_url}
+                alt={bannerSettings.title || "Delicious food background"}
+                className="h-full object-cover"
+              />
+            </div>
+          )}
+        </section>
 
         {/* Current Offers */}
         {offers.length > 0 && (

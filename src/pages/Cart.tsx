@@ -106,26 +106,24 @@ export const Cart = () => {
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map(item => (
               <Card key={item.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-4">
-                    {/* Image */}
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center">
-                      {item.menu_item?.image_url
-                        ? <img src={item.menu_item.image_url} alt={item.menu_item.name} className="w-full h-full object-cover rounded-lg" />
-                        : <span className="text-2xl opacity-50">🍽️</span>}
-                    </div>
-                    {/* Details */}
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{item.menu_item?.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.menu_item?.description}</p>
-                      <p className="price-tag">${item.menu_item?.price.toFixed(2)}</p>
-                      {item.special_requests && <p className="text-sm text-muted-foreground mt-1">Special: {item.special_requests}</p>}
-                    </div>
+                <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  {/* Image */}
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center sm:order-first sm:flex-shrink-0">
+                    {item.menu_item?.image_url
+                      ? <img src={item.menu_item.image_url} alt={item.menu_item.name} className="w-full h-full object-cover rounded-lg" />
+                      : <span className="text-2xl opacity-50">🍽️</span>}
+                  </div>
+                  {/* Details */}
+                  <div className="sm:flex-1 sm:ml-4 sm:mt-0 mt-4">
+                    <h3 className="font-semibold">{item.menu_item?.name}</h3>
+                    <p className="text-sm text-muted-foreground">{item.menu_item?.description}</p>
+                    <p className="price-tag mb-2">${item.menu_item?.price.toFixed(2)}</p>
+                    {item.special_requests && <p className="text-sm text-muted-foreground mt-1">Special: {item.special_requests}</p>}
                     {/* Quantity Controls */}
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}><Minus className="h-4 w-4" /></Button>
-                      <span className="w-12 text-center font-semibold">{item.quantity}</span>
-                      <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus className="h-4 w-4" /></Button>
+                    <div className="mt-4 sm:mt-0 sm:flex sm:items-center">
+                      <Button variant="outline" size="icon" className="sm:mr-3" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}><Minus className="h-4 w-4" /></Button>
+                      <span className="w-12 text-center font-semibold ">&nbsp;&nbsp;{item.quantity}&nbsp;&nbsp;</span>
+                      <Button variant="outline" size="icon" className="sm:ml-2" onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus className="h-4 w-4" /></Button>&nbsp;
                       <Button variant="outline" size="icon" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
