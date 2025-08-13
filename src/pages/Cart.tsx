@@ -190,9 +190,9 @@ export const Cart = () => {
                     </Button>
                   </div>
                   {/* Item Total */}
-                  <div className="text-right min-w-0">
+                  <div className="hidden lg:block text-right min-w-0">
                     <p className="font-display font-bold text-gold">
-                      ${(item.menu_item?.price * item.quantity).toFixed(2)}
+                      <p className='text-coffee'>Item Total:</p>${(item.menu_item?.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </CardContent>
