@@ -10,7 +10,7 @@ import { MenuCard } from '@/components/menu/MenuCard';
 import { CategoryFilter } from '@/components/menu/CategoryFilter';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { ScratchCard } from '@/components/scratchcard/Scratchcard';
+import { ScratchCard } from '@/components/scratchcard/ScratchCard';
 
 interface BannerSettings {
   id: string;
