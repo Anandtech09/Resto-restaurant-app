@@ -2,61 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Restaurant Design System - Beautiful, warm, and appetizing theme */
+/* Coffee Shop Design System - Warm, inviting restaurant theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Restaurant Brand Colors */
-    --background: 30 50% 98%;
-    --foreground: 20 14% 10%;
+    /* Coffee Shop Color Palette */
+    --background: 25 15% 97%;
+    --foreground: 25 15% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 20 14% 10%;
+    --card: 25 20% 96%;
+    --card-foreground: 25 15% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 10%;
+    --popover: 25 20% 98%;
+    --popover-foreground: 25 15% 15%;
 
-    /* Warm orange primary - appetizing and inviting */
-    --primary: 20 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 25 100% 60%;
-    --primary-dark: 15 100% 40%;
+    /* Coffee-inspired primary colors */
+    --primary: 25 35% 25%;
+    --primary-foreground: 25 20% 95%;
+    --primary-glow: 35 45% 45%;
 
-    /* Warm cream secondary */
-    --secondary: 35 50% 95%;
-    --secondary-foreground: 20 14% 10%;
+    /* Warm secondary tones */
+    --secondary: 35 60% 85%;
+    --secondary-foreground: 25 35% 25%;
 
-    --muted: 35 20% 92%;
-    --muted-foreground: 25 10% 45%;
+    /* Coffee accent colors */
+    --accent: 35 65% 75%;
+    --accent-foreground: 25 35% 25%;
+    --accent-warm: 40 70% 65%;
 
-    /* Gold accent for special items */
-    --accent: 45 100% 55%;
-    --accent-foreground: 20 14% 10%;
+    /* Muted earth tones */
+    --muted: 25 25% 90%;
+    --muted-foreground: 25 20% 45%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* Coffee bean brown */
+    --coffee: 25 45% 20%;
+    --coffee-light: 30 40% 35%;
+    --coffee-dark: 20 50% 15%;
 
-    --border: 30 20% 88%;
-    --input: 30 20% 92%;
-    --ring: 20 100% 50%;
+    /* Gold accent */
+    --gold: 40 85% 60%;
+    --gold-light: 45 90% 75%;
 
-    /* Restaurant specific colors */
-    --food-warm: 30 100% 50%;
-    --food-fresh: 120 50% 45%;
-    --special-gold: 45 100% 55%;
-    --price-green: 130 50% 35%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 25 20% 95%;
 
-    /* Gradients for beautiful effects */
-    --gradient-warm: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
-    --gradient-food: linear-gradient(135deg, hsl(var(--food-warm)), hsl(var(--accent)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary-dark)), hsl(var(--primary)));
-
-    /* Shadows for depth */
-    --shadow-warm: 0 4px 20px hsl(var(--primary) / 0.15);
-    --shadow-food: 0 8px 25px hsl(var(--primary) / 0.2);
-    --shadow-elegant: 0 10px 40px hsl(var(--primary) / 0.1);
+    --border: 25 25% 88%;
+    --input: 25 25% 92%;
+    --ring: 35 45% 45%;
 
     --radius: 0.75rem;
+
+    /* Coffee shop gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--coffee-dark)) 0%, hsl(var(--coffee)) 50%, hsl(var(--primary)) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(var(--accent-warm)) 0%, hsl(var(--gold-light)) 100%);
+    --gradient-coffee: linear-gradient(45deg, hsl(var(--coffee)) 0%, hsl(var(--coffee-light)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--accent) / 0.1) 100%);
+
+    /* Elegant shadows */
+    --shadow-soft: 0 2px 20px hsl(var(--coffee) / 0.1);
+    --shadow-coffee: 0 8px 32px hsl(var(--coffee) / 0.15);
+    --shadow-glow: 0 0 40px hsl(var(--gold) / 0.3);
+
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -76,41 +87,53 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark coffee shop theme */
+    --background: 20 25% 8%;
+    --foreground: 25 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 20 25% 10%;
+    --card-foreground: 25 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 20 25% 10%;
+    --popover-foreground: 25 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 35 65% 75%;
+    --primary-foreground: 20 25% 8%;
+    --primary-glow: 40 70% 65%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 25 35% 20%;
+    --secondary-foreground: 25 20% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 30 40% 25%;
+    --accent-foreground: 25 20% 95%;
+    --accent-warm: 35 60% 45%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 25 25% 15%;
+    --muted-foreground: 25 20% 65%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --coffee: 35 65% 75%;
+    --coffee-light: 40 70% 65%;
+    --coffee-dark: 30 60% 55%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --gold: 40 85% 70%;
+    --gold-light: 45 90% 80%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 25 20% 95%;
+
+    --border: 25 25% 18%;
+    --input: 25 25% 15%;
+    --ring: 35 65% 75%;
+
+    /* Dark gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--coffee-dark)) 50%, hsl(var(--coffee)) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(var(--accent-warm)) 0%, hsl(var(--gold)) 100%);
+    --gradient-coffee: linear-gradient(45deg, hsl(var(--coffee-dark)) 0%, hsl(var(--coffee)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--accent) / 0.2) 100%);
+
+    --shadow-soft: 0 2px 20px hsl(0 0% 0% / 0.3);
+    --shadow-coffee: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(var(--gold) / 0.2);
   }
 }
 
@@ -120,75 +143,111 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography */
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-script {
+    font-family: 'Dancing Script', cursive;
+  }
+  
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Custom utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .coffee-texture {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(var(--coffee) / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(var(--gold) / 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, hsl(var(--coffee-light) / 0.08) 0%, transparent 50%);
+  }
+
+  /* Animations */
+  @keyframes coffee-steam {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+    25% { transform: translateY(-10px) rotate(2deg); opacity: 1; }
+    50% { transform: translateY(-20px) rotate(-1deg); opacity: 0.8; }
+    75% { transform: translateY(-15px) rotate(1deg); opacity: 0.9; }
+  }
+
+  @keyframes bean-bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(180deg); }
+  }
+
+  @keyframes gold-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-steam {
+    animation: coffee-steam 3s ease-in-out infinite;
+  }
+
+  .animate-bean-bounce {
+    animation: bean-bounce 2s ease-in-out infinite;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--gold) / 0.4),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: gold-shimmer 2s infinite;
   }
 }
 
 @layer components {
-  /* Beautiful animations for food items */
-  .food-item {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
+  /* Card hover effects */
+  .coffee-card {
+    @apply bg-gradient-to-br from-card to-accent/10 border border-border/50 rounded-xl shadow-soft;
+    @apply hover:shadow-coffee hover:scale-[1.02] transition-all duration-300;
+    @apply backdrop-blur-sm;
   }
 
-  .food-item:hover {
-    box-shadow: var(--shadow-food);
+  /* Button variants */
+  .btn-coffee {
+    @apply bg-gradient-coffee text-primary-foreground font-medium;
+    @apply hover:shadow-glow hover:scale-105 transition-all duration-300;
+    @apply border border-coffee-light/20;
   }
 
-  /* Floating animation for special items */
-  .special-float {
-    animation: float 3s ease-in-out infinite;
+  .btn-gold {
+    @apply bg-gradient-warm text-coffee font-medium;
+    @apply hover:shadow-lg hover:scale-105 transition-all duration-300;
+    @apply border border-gold/30;
   }
 
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+  /* Navigation styles */
+  .nav-glass {
+    @apply bg-background/80 backdrop-blur-lg border-b border-border/50;
+    @apply shadow-sm supports-[backdrop-filter]:bg-background/60;
   }
 
-  /* Smooth scroll reveal animations */
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease-out;
-  }
-
-  .fade-in-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Beautiful gradient backgrounds */
-  .gradient-warm {
-    background: var(--gradient-warm);
-  }
-
-  .gradient-food {
-    background: var(--gradient-food);
-  }
-
-  .gradient-hero {
+  /* Hero section */
+  .hero-gradient {
     background: var(--gradient-hero);
+    position: relative;
   }
 
-  /* Custom button styles */
-  .btn-food {
-    @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-primary/90 active:scale-95;
-    box-shadow: var(--shadow-warm);
-  }
-
-  .btn-food:hover {
-    box-shadow: var(--shadow-elegant);
-  }
-
-  /* Price styling */
-  .price-tag {
-    @apply text-lg font-bold;
-    color: hsl(var(--price-green));
-  }
-
-  /* Special item badge */
-  .special-badge {
-    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
-    background: hsl(var(--special-gold));
-    color: hsl(var(--accent-foreground));
+  .hero-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='2'/%3E%3Ccircle cx='37' cy='23' r='1.5'/%3E%3Ccircle cx='53' cy='43' r='2'/%3E%3Ccircle cx='23' cy='53' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
   }
 }

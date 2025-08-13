@@ -10,7 +10,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 gradient-warm rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">R</span>
+                <span className="text-gold font-black font-extrabold text-3xl">R</span>
               </div>
               <span className="font-bold text-xl">Resto</span>
             </div>
@@ -75,7 +75,7 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 Resto. All rights reserved. Made with ❤️ for food lovers.
+            © 2024 Resto. All rights reserved.
           </p>
         </div>
       </div>

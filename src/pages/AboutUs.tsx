@@ -12,8 +12,8 @@ export const AboutUs = () => {
       <section className="gradient-hero text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">About Our Restaurant</h1>
-            <p className="text-xl md:text-2xl text-white/90">
+            <h1 className="text-4xl md:text-6xl text-coffee font-bold mb-6">About Our Restaurant</h1>
+            <p className="text-xl md:text-2xl text-gold">
               Passionate about delivering exceptional culinary experiences since 2015
             </p>
           </div>
@@ -55,7 +55,7 @@ export const AboutUs = () => {
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="w-16 h-16 gradient-warm rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ChefHat className="h-8 w-8 text-white" />
+                  <ChefHat className="h-8 w-8 text-coffee" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Quality First</h3>
                 <p className="text-muted-foreground">
@@ -67,7 +67,7 @@ export const AboutUs = () => {
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="w-16 h-16 gradient-warm rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="h-8 w-8 text-white" />
+                  <Heart className="h-8 w-8 text-coffee" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Made with Love</h3>
                 <p className="text-muted-foreground">
@@ -79,7 +79,7 @@ export const AboutUs = () => {
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="w-16 h-16 gradient-warm rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Star className="h-8 w-8 text-white" />
+                  <Star className="h-8 w-8 text-coffee" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Customer First</h3>
                 <p className="text-muted-foreground">
@@ -91,7 +91,7 @@ export const AboutUs = () => {
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="w-16 h-16 gradient-warm rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="h-8 w-8 text-white" />
+                  <Award className="h-8 w-8 text-coffee" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Excellence</h3>
                 <p className="text-muted-foreground">

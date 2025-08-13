@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, X, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { MenuItem, MenuCategory } from '@/types';
@@ -13,10 +15,22 @@ export const Menu = () => {
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Close search on Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
   const fetchData = async () => {
@@ -37,7 +51,7 @@ export const Menu = () => {
 
   const filteredItems = menuItems.filter(item => {
     const matchesCategory = !selectedCategory || item.category_id === selectedCategory;
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -46,61 +60,113 @@ export const Menu = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <Header>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-coffee hover:bg-coffee/10"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+        </Header>
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading menu...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+            <p className="text-muted-foreground font-medium">Loading delicious menu...</p>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-coffee hover:bg-coffee/10"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      </Header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Our Menu</h1>
-          <p className="text-muted-foreground text-lg">Discover our delicious selection of dishes</p>
-        </div>
-
-        {/* Search */}
-        <div className="max-w-md mx-auto mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
+      {/* Search Box Centered on Screen */}
+      {isSearchOpen && (
+        <div className="fixed inset-x-0 top-20 z-50 flex items-center justify-center px-4">
+          <div className="w-full max-w-md relative">
+            <input
               type="text"
               placeholder="Search menu items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              autoFocus
+              className="w-full px-10 py-2 rounded-full border border-coffee/30 bg-white shadow-coffee text-coffee focus:outline-none focus:ring-2 focus:ring-gold"
             />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-coffee h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-coffee hover:bg-coffee/10"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+      )}
 
-        {/* Category Filter */}
-        <CategoryFilter 
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategorySelect={setSelectedCategory}
-        />
-
-        {/* Menu Items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-          {filteredItems.map((item) => (
-            <MenuCard key={item.id} item={item} />
-          ))}
-        </div>
-
-        {filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No items found matching your criteria.</p>
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center mb-8 animate-fade-up">
+            <p className="font-script text-2xl text-gold mb-4">Explore</p>
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-coffee mb-4">Our Menu</h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Discover our delicious selection of dishes
+            </p>
           </div>
-        )}
-      </div>
+
+          {/* Category Filter */}
+          <CategoryFilter
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+            className="animate-scale-in"
+          />
+
+          {/* Menu Items */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+            {filteredItems.slice(0, 8).map((item) => (
+              <MenuCard key={item.id} item={item} variant="featured" className="animate-scale-in" />
+            ))}
+          </div>
+
+          {filteredItems.length === 0 && (
+            <div className="text-center py-12 animate-fade-up">
+              <p className="text-muted-foreground text-lg">No items found matching your criteria.</p>
+            </div>
+          )}
+
+          {filteredItems.length > 8 && (
+            <div className="text-center mt-12">
+              <Button
+                size="lg"
+                className="btn-gold group animate-gold-shimmer"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory(null);
+                }}
+              >
+                View All {filteredItems.length} Items
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </main>
 
       <Footer />
     </div>

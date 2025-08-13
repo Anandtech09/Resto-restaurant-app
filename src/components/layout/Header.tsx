@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, User, Menu as MenuIcon, Search, LogOut } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ShoppingCart, User, Menu, X, Search, LogOut, Coffee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -8,17 +8,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeaderProps {
   onSearchChange?: (query: string) => void;
   searchQuery?: string;
+  children?: React.ReactNode; // Allow passing the search button from Home.tsx
 }
 
-export const Header = ({ onSearchChange, searchQuery }: HeaderProps) => {
+export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) => {
   const { user, isAuthenticated, signOut } = useAuth();
   const { getItemCount } = useCart();
   const { toast } = useToast();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const isMobile = useIsMobile('(max-width: 768px)');
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -27,60 +31,74 @@ export const Header = ({ onSearchChange, searchQuery }: HeaderProps) => {
         title: "Signed out successfully",
         description: "You have been logged out.",
       });
+      setIsMenuOpen(false);
+      window.location.href = "/";
     }
   };
 
   const cartItemCount = getItemCount();
 
+  const navigation = [
+    { name: 'Home', href: '/' },
+    { name: 'Menu', href: '/menu' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+  ];
+
+  const isActive = (href: string) => location.pathname === href;
+
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+    <header className="sticky top-0 z-50 nav-glass">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 gradient-warm rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">R</span>
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="relative">
+              <Coffee className="h-8 w-8 text-coffee group-hover:animate-bean-bounce" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gold rounded-full animate-pulse opacity-75" />
             </div>
-            <span className="font-bold text-xl text-foreground">Resto</span>
+            <div>
+              <h1 className="font-display text-xl font-bold text-coffee">Resto</h1>
+              <p className="font-script text-xs text-gold -mt-1">Premium Dining</p>
+            </div>
           </Link>
 
-          {/* Search Bar - Desktop */}
-          {onSearchChange && (
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search menu items..."
-                  value={searchQuery || ''}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-          )}
-
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link to="/menu">
-              <Button variant="ghost">Menu</Button>
-            </Link>
-            {isAuthenticated && (
-              <>
-                <Link to="/orders">
-                  <Button variant="ghost">Orders</Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="ghost">Profile</Button>
-                </Link>
-              </>
-            )}
-            
+          <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`font-medium transition-colors duration-200 relative group ${
+                  isActive(item.href)
+                    ? 'text-coffee'
+                    : 'text-muted-foreground hover:text-coffee'
+                }`}
+              >
+                {item.name}
+                <span
+                  className={`absolute -bottom-1 left-0 w-full h-0.5 bg-gold transform origin-left transition-transform duration-300 ${
+                    isActive(item.href) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`}
+                />
+              </Link>
+            ))}
+          </nav>
+
+          {/* Desktop Actions (Cart, Search, Auth) */}
+          <div className="flex items-center space-x-4">
+            {/* Search Button */}
+            {children}
+
             {/* Cart */}
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
+              <Button variant="ghost" size="sm" className="relative hover:bg-accent/10">
+                <ShoppingCart className="h-5 w-5 text-coffee" />
                 {cartItemCount > 0 && (
-                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs bg-gold text-coffee hover:bg-gold/90"
+                  >
                     {cartItemCount}
                   </Badge>
                 )}
@@ -91,8 +109,8 @@ export const Header = ({ onSearchChange, searchQuery }: HeaderProps) => {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="sm" className="hover:bg-accent/10">
+                    <User className="h-5 w-5 text-coffee" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -110,75 +128,79 @@ export const Header = ({ onSearchChange, searchQuery }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth">
-                <Button className="btn-food">Sign In</Button>
-              </Link>
+              !isMobile && (
+                <Link to="/auth">
+                  <Button className="btn-coffee text-sm">Sign In</Button>
+                </Link>
+              )
             )}
-          </nav>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <MenuIcon className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* Mobile Search */}
-        {onSearchChange && (
-          <div className="md:hidden pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search menu items..."
-                value={searchQuery || ''}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden hover:bg-accent/10"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-5 w-5 text-coffee" />
+              ) : (
+                <Menu className="h-5 w-5 text-coffee" />
+              )}
+            </Button>
           </div>
-        )}
+        </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border py-4">
-            <nav className="flex flex-col space-y-2">
-              <Link to="/menu" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">Menu</Button>
-              </Link>
-              {isAuthenticated && (
-                <>
-                  <Link to="/orders" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start">Orders</Button>
-                  </Link>
-                  <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start">Profile</Button>
-                  </Link>
-                </>
-              )}
-              <Link to="/cart" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">
-                  Cart {cartItemCount > 0 && `(${cartItemCount})`}
-                </Button>
-              </Link>
-              {isAuthenticated ? (
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-destructive"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    handleSignOut();
-                  }}
+          <div className="md:hidden py-4 border-t border-border/50">
+            <nav className="flex flex-col space-y-3">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`font-medium py-2 px-4 rounded-lg transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? 'text-coffee bg-accent/10'
+                      : 'text-muted-foreground hover:text-coffee hover:bg-accent/5'
+                  }`}
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
+                  {item.name}
+                </Link>
+              ))}
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-muted-foreground hover:text-coffee hover:bg-accent/5"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/orders"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-muted-foreground hover:text-coffee hover:bg-accent/5"
+                  >
+                    Orders
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="font-medium py-2 px-4 rounded-lg text-destructive hover:bg-accent/5 w-full text-left"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
               ) : (
-                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="btn-food w-full">Sign In</Button>
+                <Link
+                  to="/auth"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                >
+                  <Button className="btn-coffee w-full">Sign In</Button>
                 </Link>
               )}
             </nav>

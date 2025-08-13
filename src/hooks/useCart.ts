@@ -64,6 +64,11 @@ export const useCart = () => {
         description: "You need to log in to add items to cart",
         variant: "destructive"
       });
+
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 2000);
+
       return;
     }
 
@@ -204,7 +209,8 @@ export const useCart = () => {
   };
 
   const getItemCount = () => {
-    return cartItems.reduce((count, item) => count + item.quantity, 0);
+    const uniqueItems = new Set(cartItems.map(item => item.menu_item.id));
+    return uniqueItems.size;
   };
 
   return {

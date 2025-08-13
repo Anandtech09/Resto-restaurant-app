@@ -56,8 +56,8 @@ export const ContactUs = () => {
       <section className="gradient-hero text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact Us</h1>
-            <p className="text-xl md:text-2xl text-white/90">
+            <h1 className="text-4xl md:text-6xl font-bold text-coffee mb-6">Contact Us</h1>
+            <p className="text-xl md:text-2xl text-gold">
               We'd love to hear from you. Get in touch with our team!
             </p>
           </div>
@@ -81,7 +81,7 @@ export const ContactUs = () => {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center flex-shrink-0">
-                      <MapPin className="h-6 w-6 text-white" />
+                      <MapPin className="h-6 w-6 text-coffee" />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Our Location</h3>
@@ -99,7 +99,7 @@ export const ContactUs = () => {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center flex-shrink-0">
-                      <Phone className="h-6 w-6 text-white" />
+                      <Phone className="h-6 w-6 text-coffee" />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Phone Number</h3>
@@ -117,7 +117,7 @@ export const ContactUs = () => {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center flex-shrink-0">
-                      <Mail className="h-6 w-6 text-white" />
+                      <Mail className="h-6 w-6 text-coffee" />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Email Address</h3>
@@ -135,7 +135,7 @@ export const ContactUs = () => {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center flex-shrink-0">
-                      <Clock className="h-6 w-6 text-white" />
+                      <Clock className="h-6 w-6 text-coffee" />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Business Hours</h3>

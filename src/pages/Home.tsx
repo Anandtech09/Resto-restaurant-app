@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChefHat, Clock, Truck } from 'lucide-react';
+import { ChefHat, Clock, Truck, Search, ArrowRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,10 +10,10 @@ import { MenuCard } from '@/components/menu/MenuCard';
 import { CategoryFilter } from '@/components/menu/CategoryFilter';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { ScratchCard } from '@/components/scratchcard/ScratchCard';
 
 interface BannerSettings {
   id: string;
-  image_url?: string;
   title: string;
   subtitle: string;
   button_text: string;
@@ -27,12 +27,23 @@ export const Home = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [bannerSettings, setBannerSettings] = useState<BannerSettings | null>(null);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Scroll to "Browse Our Menu" when search is opened or searchQuery changes
+  useEffect(() => {
+    if (isSearchOpen) {
+      const browseMenuSection = document.getElementById('browse-menu');
+      if (browseMenuSection) {
+        browseMenuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [isSearchOpen, searchQuery]);
 
   const fetchData = async () => {
     try {
@@ -47,7 +58,6 @@ export const Home = () => {
       if (itemsRes.data) setMenuItems(itemsRes.data);
       if (offersRes.data) setOffers(offersRes.data as Offer[]);
       if (bannerRes.data) setBannerSettings(bannerRes.data);
-
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -68,11 +78,20 @@ export const Home = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <Header>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-coffee hover:bg-coffee/10"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+        </Header>
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading delicious menu...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+            <p className="text-muted-foreground font-medium">Loading delicious menu...</p>
           </div>
         </div>
         <Footer />
@@ -82,73 +101,157 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header onSearchChange={setSearchQuery} searchQuery={searchQuery} />
+      <Header>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-coffee hover:bg-coffee/10"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      </Header>
+
+      {/* Search Box Centered on Screen */}
+      {isSearchOpen && (
+        <div className="fixed inset-x-0 top-20 z-50 flex items-center justify-center px-4">
+          <div className="w-full max-w-md relative">
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+              className="w-full px-10 py-2 rounded-full border border-coffee/30 bg-white shadow-coffee text-coffee focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-coffee h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-coffee hover:bg-coffee/10"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section
-          className="relative flex items-center justify-center min-h-[60vh] text-black overflow-hidden"
-          style={{
-            backgroundImage: "url('https://static.vecteezy.com/system/resources/thumbnails/050/679/260/small_2x/fresh-vegetables-and-fruits-arranged-on-a-vibrant-orange-backdrop-creating-a-colorful-culinary-display-in-a-kitchen-setting-photo.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          {/* FIX 1: Wrapped content in a single container div for proper centering. */}
-          <div className="relative z-10 text-center container mx-auto px-4">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg text-primary-foreground">
-              {bannerSettings?.title || 'Delicious Food, Delivered.'}
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-secondary-foreground drop-shadow-md max-w-3xl mx-auto">
-              {bannerSettings?.subtitle || 'Experience restaurant-quality meals delivered straight to your door.'}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to={bannerSettings?.button_link || "/menu"}>
-                <Button size="lg" variant="outline" className="border-white text-white bg-white/10 px-8 py-4 text-lg">
-                  {bannerSettings?.button_text || 'Order Now'}
-                </Button>
-              </Link>
-              <Link to="/menu">
-                <Button size="lg" variant="outline" className="border-primary-foreground text-secondary-foreground hover:bg-primary-foreground/10 px-8 py-4 text-lg">
-                  View Menu
-                </Button>
-              </Link>
+        {!isSearchOpen && (
+          <section
+            className="relative h-[calc(100vh-1rem)] flex items-center justify-center overflow-hidden"
+            style={{
+              backgroundImage: "url('https://plus.unsplash.com/premium_photo-1661883237884-263e8de8869b?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHx8MA%3D%3D')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="absolute inset-0 hero-gradient opacity-90" />
+            <div className="relative z-10 text-center container mx-auto px-4">
+              <div className="animate-fade-up">
+                <p className="font-script text-2xl md:text-3xl text-gold mb-4">Welcome to</p>
+                <h1 className="font-display text-5xl md:text-7xl font-bold text-primary-foreground mb-6">
+                  {bannerSettings?.title || 'Delicious Food'}
+                  <br />
+                  <span className="text-gold">Delivered</span>
+                </h1>
+                <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+                  {bannerSettings?.subtitle || 'Experience restaurant-quality meals delivered straight to your door.'}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Link to={bannerSettings?.button_link || "/menu"}>
+                    <Button size="lg" className="btn-gold group">
+                      {bannerSettings?.button_text || 'Order Now'}
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link to="/menu">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-primary-foreground/30 text-white bg-coffee"
+                    >
+                      View Menu
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* Banner Image */}
-        <section className="mt-8 md:mt-16">
-          {bannerSettings?.image_url && (
-            <div className="relative w-full h-[420px] md:h-[600px] flex justify-center">
-              <img
-                src={bannerSettings.image_url}
-                alt={bannerSettings.title || "Delicious food background"}
-                className="h-full object-cover"
-              />
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <div className="w-6 h-10 border-2 border-primary-foreground/30 rounded-full flex justify-center">
+                <div className="w-1 h-3 bg-gold rounded-full mt-2 animate-pulse" />
+              </div>
             </div>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* Current Offers */}
-        {offers.length > 0 && (
-          <section className="py-16">
+        {!isSearchOpen && offers.length > 0 && (
+          <section className="py-20 coffee-texture">
             <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12">Special Offers</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center mb-16">
+                <p className="font-script text-2xl text-gold mb-4">Limited Time</p>
+                <h2 className="font-display text-4xl md:text-5xl font-bold text-coffee mb-6">Special Offers</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                  Take advantage of our exclusive deals crafted just for you.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {offers.map((offer) => (
-                  <Card key={offer.id} className="gradient-food text-white overflow-hidden">
-                    <CardContent className="p-6 text-center flex flex-col items-center">
-                      <Badge className="bg-white/20 text-white mb-4">
-                        {offer.discount_type === 'percentage' ? `${offer.discount_value}% OFF` : `$${offer.discount_value} OFF`}
-                      </Badge>
-                      <h3 className="text-xl font-bold mb-2">{offer.title}</h3>
-                      <p className="text-white/90 mb-4">{offer.description}</p>
-                      <p className="text-sm text-white/80">Min order: ${offer.min_order_amount}</p>
-                      <Button className="mt-4 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30 border border-white/30">
-                        Use Code: {offer.code}
-                      </Button>
+                  <Card
+                    key={offer.id}
+                    className="bg-gradient-warm text-coffee overflow-hidden shadow-coffee relative w-full max-w-sm mx-auto transform transition-all duration-300 hover:scale-105"
+                  >
+                    <CardContent className="p-6 text-center flex flex-col items-center relative z-10">
+                      {/* Ticket Top Section (Logo/Brand Placeholder) */}
+                      <div className="absolute top-2 left-2 text-sm text-white font-inter bg-coffee-light/80 px-2 py-1 rounded-md">
+                        Resto.
+                      </div>
+
+                      {/* Main Offer Value */}
+                      <h2 className="font-display text-3xl font-bold text-coffee-dark mb-2 mt-6">
+                        {offer.discount_type === 'percentage'
+                          ? `${offer.discount_value}% OFF`
+                          : `$${offer.discount_value} OFF`}
+                      </h2>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        When you spend ${offer.min_order_amount}
+                      </p>
+
+                      {/* Ticket Body (Perforated Effect) */}
+                      <div className="w-full h-px bg-coffee/20 my-4 relative">
+                        <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-transparent via-coffee-light/50 to-transparent opacity-50" />
+                      </div>
+
+                      {/* Ticket Details */}
+                      <div className="bg-coffee/20 p-4 rounded-lg shadow-inner w-full">
+                        <h3 className="font-display text-lg font-semibold mb-2">{offer.title}</h3>
+                        <p className="text-muted-foreground text-sm mb-2">{offer.description}</p>
+                        <p className="text-sm text-muted-foreground">Min order: ${offer.min_order_amount}</p>
+                      </div>
+
+                      {/* Scratch Card Section */}
+                      <div className="w-full flex justify-center">
+                        <ScratchCard code={offer.code} />
+                      </div>
+
+                      {/* Ticket Bottom Section */}
+                      <div className="w-full text-left mt-4 text-sm text-muted-foreground">
+                        Free offer for you!
+                      </div>
                     </CardContent>
+
+                    {/* Ticket Shape with Clipped Corners and Perforated Edges */}
+                    <div className="absolute inset-0 border-2 border-coffee-dark/20 rounded-lg overflow-hidden">
+                      <div className="absolute top-0 left-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 0 100%)" />
+                      <div className="absolute top-0 right-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 100% 100%)" />
+                      <div className="absolute bottom-0 left-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 0 100%)" />
+                      <div className="absolute bottom-0 right-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 100% 100%)" />
+                      <div className="absolute top-1/2 left-0 w-2 h-8 bg-coffee-dark/10 clip-path-polygon(0 0, 100% 50%, 0 100%)" />
+                      <div className="absolute top-1/2 right-0 w-2 h-8 bg-coffee-dark/10 clip-path-polygon(0 50%, 100% 0, 100% 100%) transform -scale-x-100" />
+                    </div>
                   </Card>
                 ))}
               </div>
@@ -157,33 +260,34 @@ export const Home = () => {
         )}
 
         {/* Today's Specials */}
-        {specialItems.length > 0 && (
-          <section className="py-16 bg-secondary/30">
+        {!isSearchOpen && specialItems.length > 0 && (
+          <section className="py-20 bg-gradient-warm">
             <div className="container mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold mb-4">Today's Specials</h2>
-                <p className="text-muted-foreground text-lg">Chef's recommended dishes made with the finest ingredients.</p>
+              <div className="text-center mb-16">
+                <p className="font-script text-2xl text-white mb-4">Chef's Picks</p>
+                <h2 className="font-display text-4xl md:text-5xl font-bold text-coffee mb-6">Today's Specials</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                  Chef's recommended dishes made with the finest ingredients.
+                </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {specialItems.map((item) => (
-                  <MenuCard key={item.id} item={item} />
+                  <MenuCard key={item.id} item={item} variant="featured" />
                 ))}
-              </div>
-              <div className="text-center mt-8">
-                <Link to="/menu">
-                  <Button size="lg" className="btn-food">View Full Menu</Button>
-                </Link>
               </div>
             </div>
           </section>
         )}
 
-        {/* Browse Menu */}
-        <section className="py-16">
+        {/* Browse Our Menu (Always Visible, Scrolls to Top When Search is Open) */}
+        <section id="browse-menu" className="py-20">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Browse Our Menu</h2>
-              <p className="text-muted-foreground text-lg">Discover delicious dishes across all categories.</p>
+            <div className="text-center mb-16">
+              <p className="font-script text-2xl text-gold mb-4">Explore</p>
+              <h2 className="font-display text-4xl md:text-5xl font-bold text-coffee mb-6">Browse Our Menu</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                Discover delicious dishes across all categories.
+              </p>
             </div>
 
             <CategoryFilter
@@ -192,21 +296,56 @@ export const Home = () => {
               onCategorySelect={setSelectedCategory}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-              {filteredItems.slice(0, 8).map((item) => (
-                <MenuCard key={item.id} item={item} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
+              {filteredItems.slice(0, 4).map((item) => (
+                <MenuCard key={item.id} item={item} variant="featured" />
               ))}
             </div>
 
-            {filteredItems.length > 8 && (
-              <div className="text-center mt-8">
+            {filteredItems.length > 3 && (
+              <div className="text-center mt-12">
                 <Link to="/menu">
-                  <Button size="lg" variant="outline">View All {filteredItems.length} Items</Button>
+                  <Button size="lg" className="btn-coffee group">
+                    View All {filteredItems.length} Items
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </Link>
               </div>
             )}
           </div>
         </section>
+
+        {/* CTA Section */}
+        {!isSearchOpen && (
+          <section className="py-20 hero-gradient text-primary-foreground">
+            <div className="container mx-auto px-4 text-center">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
+                  Ready for the Perfect
+                  <br />
+                  <span className="text-gold">Dining Experience?</span>
+                </h2>
+                <p className="text-xl text-primary-foreground/90 mb-8">
+                  Join thousands of food lovers who enjoy our exceptional dishes. Your perfect meal awaits.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link to="/menu">
+                    <Button size="lg" className="btn-gold">
+                      Order Now
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-primary-foreground/30 text-white bg-coffee"
+                  >
+                    Find Our Location
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
