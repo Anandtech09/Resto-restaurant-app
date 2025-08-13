@@ -1,49 +1,49 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
-interface BannerSettings {
-  id: string;
-  title: string;
-  subtitle: string;
-  button_text: string;
-  button_link: string;
-  is_active: boolean;
+interface ScratchCardProps {
+  code: string;
 }
 
-// Scratch Card Component
-export const ScratchCard = ({ code }: { code: string }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+export const ScratchCard = ({ code }: ScratchCardProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scratched, setScratched] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     canvas.width = 200;
     canvas.height = 60;
 
-    ctx.fillStyle = '#c0c0c0'; // Gold scratch layer
+    // Draw scratch layer
+    ctx.fillStyle = "#c0c0c0";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#000';
-    ctx.font = '16px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Scratch Here', canvas.width / 2, canvas.height / 2 + 6);
+    ctx.fillStyle = "#000";
+    ctx.font = "16px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Scratch Here", canvas.width / 2, canvas.height / 2);
 
     const handleScratch = (e: MouseEvent | TouchEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const x =
-        'touches' in e
-          ? e.touches[0].clientX - rect.left
-          : (e as MouseEvent).clientX - rect.left;
-      const y =
-        'touches' in e
-          ? e.touches[0].clientY - rect.top
-          : (e as MouseEvent).clientY - rect.top;
+      if (!canvas || !ctx) return;
 
-      ctx.globalCompositeOperation = 'destination-out';
+      const rect = canvas.getBoundingClientRect();
+      let x: number, y: number;
+
+      if ("touches" in e && e.touches.length > 0) {
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        const mouseEvent = e as MouseEvent;
+        x = mouseEvent.clientX - rect.left;
+        y = mouseEvent.clientY - rect.top;
+      }
+
+      ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
       ctx.arc(x, y, 15, 0, Math.PI * 2);
       ctx.fill();
@@ -53,12 +53,19 @@ export const ScratchCard = ({ code }: { code: string }) => {
       for (let i = 3; i < imageData.data.length; i += 4) {
         if (imageData.data[i] === 0) cleared++;
       }
+
       if (cleared > imageData.data.length / 8) {
         setScratched(true);
       }
     };
 
-    const events = ['mousedown', 'touchstart', 'mousemove', 'touchmove'];
+    const events: (keyof HTMLElementEventMap)[] = [
+      "mousedown",
+      "mousemove",
+      "touchstart",
+      "touchmove",
+    ];
+
     events.forEach((event) => {
       canvas.addEventListener(event, handleScratch);
     });
@@ -76,12 +83,12 @@ export const ScratchCard = ({ code }: { code: string }) => {
         <canvas
           ref={canvasRef}
           className="rounded-lg shadow-md cursor-pointer"
-          style={{ width: '200px', height: '60px' }}
+          style={{ width: "200px", height: "60px" }}
         />
       ) : (
         <button
           className="bg-green-500 text-white p-3 rounded-lg font-bold text-lg shadow-md"
-          style={{ width: '200px', height: '60px' }}
+          style={{ width: "200px", height: "60px" }}
         >
           {code}
         </button>
@@ -89,4 +96,3 @@ export const ScratchCard = ({ code }: { code: string }) => {
     </div>
   );
 };
-
