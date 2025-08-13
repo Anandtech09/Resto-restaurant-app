@@ -21,9 +21,8 @@ export const Auth = () => {
   const [otp, setOtp] = useState('');
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [timer, setTimer] = useState(300);
-
-  // Added for frontend OTP display
   const [otpDisplay, setOtpDisplay] = useState<string | null>(null);
+  const [expectedOtp, setExpectedOtp] = useState<string>(''); // 👉 Store the correct OTP here
 
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -52,38 +51,34 @@ export const Auth = () => {
       return;
     }
 
-    setOtpDisplay(null); // Clear old OTP display
+    setOtpDisplay(null);
     setLoading(true);
     try {
-      console.log('Sending OTP to:', fullPhone);
-
       const { data, error } = await supabase.functions.invoke('sent-otp', {
         body: { phone: fullPhone, action: 'send' },
       });
 
-      console.log('OTP Response:', { data, error });
-
-      if (error || !data?.success) {
+      if (error || !data?.otp) {
         throw new Error(data?.message || error?.message || 'Failed to send OTP');
       }
 
+      setExpectedOtp(data.otp); // 👉 Store OTP
       setOtpSent(true);
       setTimer(300);
+
       toast({
         title: 'OTP Sent',
         description: `OTP has been sent to ${fullPhone}`,
       });
 
-      // Show actual returned OTP after 5 sec (if you want to display it for testing)
-      if (data?.otp) {
-        setTimeout(() => {
-          setOtpDisplay(`Your OTP is: ${data.otp}`);
-        }, 5000);
-      }
+      setTimeout(() => {
+        setOtpDisplay(`Your OTP is: ${data.otp}`);
+      }, 5000);
     } catch (err) {
       console.error('Send OTP Error:', err);
 
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      setExpectedOtp(generatedOtp); // 👉 Store fallback OTP
 
       setOtpSent(true);
       setTimer(300);
@@ -94,7 +89,6 @@ export const Auth = () => {
         variant: 'destructive',
       });
 
-      // Show fallback OTP after 5 sec
       setTimeout(() => {
         setOtpDisplay(`Your OTP is: ${generatedOtp}`);
       }, 5000);
@@ -113,18 +107,17 @@ export const Auth = () => {
       return;
     }
 
+    if (otp !== expectedOtp) {
+      toast({
+        title: 'Invalid OTP',
+        description: 'The verification code is incorrect.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setVerifyingOtp(true);
     try {
-      console.log('Verifying OTP for:', fullPhone, 'with code:', otp);
-
-      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('sent-otp', {
-        body: { phone: fullPhone, action: 'verify', code: otp },
-      });
-
-      if (verifyError) {
-        console.warn('Verify OTP Error:', verifyError);
-      }
-
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: dummyEmail,
         password,
@@ -158,7 +151,7 @@ export const Auth = () => {
 
       navigate('/');
     } catch (error: any) {
-      console.error('Verify and Signup Error:', error);
+      console.error('Signup Error:', error);
       toast({
         title: 'Error',
         description: error.message || 'Failed to create account',
@@ -204,19 +197,8 @@ export const Auth = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <Card className="border-gold">
-            {/* OTP display on top of card */}
             {otpDisplay && (
-              <div
-                style={{
-                  backgroundColor: '#f5f0e6',
-                  border: '2px solid #6f4e37',
-                  color: '#2d2d2d',
-                  fontWeight: 'bold',
-                  padding: '10px',
-                  textAlign: 'center',
-                  marginBottom: '10px',
-                }}
-              >
+              <div className="bg-[#f5f0e6] border-2 border-[#6f4e37] text-[#2d2d2d] font-bold p-2 text-center mb-2">
                 {otpDisplay}
               </div>
             )}
@@ -387,6 +369,7 @@ export const Auth = () => {
                       setPassword('');
                       setFullName('');
                       setOtpDisplay(null);
+                      setExpectedOtp('');
                     }}
                   >
                     {isSignUp ? 'Sign in here' : 'Create account'}
