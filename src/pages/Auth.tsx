@@ -22,14 +22,18 @@ export const Auth = () => {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [timer, setTimer] = useState(300);
   const [otpDisplay, setOtpDisplay] = useState<string | null>(null);
-  const [expectedOtp, setExpectedOtp] = useState<string>(''); // 👉 Store the correct OTP here
+  const [expectedOtp, setExpectedOtp] = useState<string>('');
 
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/');
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated && !authLoading) {
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/';
+      sessionStorage.removeItem('redirectAfterLogin');
+      navigate(redirectPath);
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   useEffect(() => {
     if (otpSent && timer > 0) {
@@ -62,7 +66,7 @@ export const Auth = () => {
         throw new Error(data?.message || error?.message || 'Failed to send OTP');
       }
 
-      setExpectedOtp(data.otp); // 👉 Store OTP
+      setExpectedOtp(data.otp);
       setOtpSent(true);
       setTimer(300);
 
@@ -78,20 +82,14 @@ export const Auth = () => {
       console.error('Send OTP Error:', err);
 
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      setExpectedOtp(generatedOtp); // 👉 Store fallback OTP
+      setExpectedOtp(generatedOtp);
 
       setOtpSent(true);
       setTimer(300);
 
-      toast({
-        title: 'Unable to send OTP',
-        description: 'Due to free Twilio account or function error, OTP not sent to mobile.',
-        variant: 'destructive',
-      });
-
       setTimeout(() => {
         setOtpDisplay(`Your OTP is: ${generatedOtp}`);
-      }, 5000);
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -148,8 +146,6 @@ export const Auth = () => {
         title: 'Success',
         description: 'Account created and signed in.',
       });
-
-      navigate('/');
     } catch (error: any) {
       console.error('Signup Error:', error);
       toast({
@@ -177,13 +173,11 @@ export const Auth = () => {
         title: 'Signed In',
         description: 'Welcome back!',
       });
-
-      navigate('/');
     } catch (error: any) {
       console.error('Login Error:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Invalid credentials',
+        description: error.message || 'Invalid credentials. Please check your phone number and password.',
         variant: 'destructive',
       });
     } finally {
@@ -194,15 +188,16 @@ export const Auth = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-4 py-16">
+      {otpDisplay && (
+        <div className="flex justify-center">
+          <div className="bg-white p-6 rounded-lg mt-2 shadow-md w-96">
+            <p className="text-center text-1xl font-bold text-coffee">{otpDisplay}</p>
+          </div>
+        </div>
+      )}
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto">
           <Card className="border-gold">
-            {otpDisplay && (
-              <div className="bg-[#f5f0e6] border-2 border-[#6f4e37] text-[#2d2d2d] font-bold p-2 text-center mb-2">
-                {otpDisplay}
-              </div>
-            )}
-
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold">
                 {isSignUp ? 'Create Account' : 'Welcome Back'}

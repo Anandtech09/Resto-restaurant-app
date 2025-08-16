@@ -18,8 +18,13 @@ export const MenuCard = ({ item, variant = 'default', className }: MenuCardProps
 
   const handleAddToCart = async () => {
     setIsAdding(true);
-    await addToCart(item);
-    setIsAdding(false);
+    try {
+      await addToCart(item);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -29,7 +34,7 @@ export const MenuCard = ({ item, variant = 'default', className }: MenuCardProps
         ${item.is_special ? 'special-float ring-2 ring-accent/20' : ''} 
         ${className}`}
     >
-      <CardContent className="p-4 flex flex-col h-full">
+      <CardContent className="coffee-card p-4 flex flex-col h-full">
         <div className="flex-grow">
           {/* Image */}
           <div className="relative">
@@ -39,8 +44,8 @@ export const MenuCard = ({ item, variant = 'default', className }: MenuCardProps
                 alt={item.name}
                 className="w-full h-48 object-cover rounded-md mb-4"
                 onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  target.style.display = 'none';
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling!.style.display = 'flex';
                 }}
               />
             ) : (
@@ -48,6 +53,12 @@ export const MenuCard = ({ item, variant = 'default', className }: MenuCardProps
                 🍽️
               </div>
             )}
+            <div
+              className="w-full h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-4xl opacity-20 rounded-md mb-4"
+              style={{ display: 'none' }}
+            >
+              🍽️
+            </div>
 
             {/* Special Badge */}
             {item.is_special && (

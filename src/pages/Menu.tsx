@@ -139,7 +139,7 @@ export const Menu = () => {
 
           {/* Menu Items */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-            {filteredItems.slice(0, 8).map((item) => (
+            {filteredItems.map((item) => (
               <MenuCard key={item.id} item={item} variant="featured" className="animate-scale-in" />
             ))}
           </div>
@@ -147,22 +147,6 @@ export const Menu = () => {
           {filteredItems.length === 0 && (
             <div className="text-center py-12 animate-fade-up">
               <p className="text-muted-foreground text-lg">No items found matching your criteria.</p>
-            </div>
-          )}
-
-          {filteredItems.length > 8 && (
-            <div className="text-center mt-12">
-              <Button
-                size="lg"
-                className="btn-gold group animate-gold-shimmer"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory(null);
-                }}
-              >
-                View All {filteredItems.length} Items
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
             </div>
           )}
         </div>

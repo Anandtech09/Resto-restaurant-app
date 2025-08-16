@@ -1,24 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Search, LogOut, Coffee } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Coffee, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
-import { useCart } from '@/hooks/useCart';
+import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeaderProps {
   onSearchChange?: (query: string) => void;
   searchQuery?: string;
-  children?: React.ReactNode; // Allow passing the search button from Home.tsx
+  children?: React.ReactNode;
 }
 
 export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) => {
   const { user, isAuthenticated, signOut } = useAuth();
-  const { getItemCount } = useCart();
+  const { cartItemCount } = useCartStore();
   const { toast } = useToast();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -28,15 +27,13 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
     const { error } = await signOut();
     if (!error) {
       toast({
-        title: "Signed out successfully",
-        description: "You have been logged out.",
+        title: 'Signed out successfully',
+        description: 'You have been logged out.',
       });
       setIsMenuOpen(false);
-      window.location.href = "/";
+      window.location.href = '/';
     }
   };
-
-  const cartItemCount = getItemCount();
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -51,7 +48,6 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
     <header className="sticky top-0 z-50 nav-glass">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="relative">
               <Coffee className="h-8 w-8 text-coffee group-hover:animate-bean-bounce" />
@@ -63,7 +59,6 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
             {navigation.map((item) => (
               <Link
@@ -85,12 +80,8 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
             ))}
           </nav>
 
-          {/* Desktop Actions (Cart, Search, Auth) */}
           <div className="flex items-center space-x-4">
-            {/* Search Button */}
             {children}
-
-            {/* Cart */}
             <Link to="/cart">
               <Button variant="ghost" size="sm" className="relative hover:bg-accent/10">
                 <ShoppingCart className="h-5 w-5 text-coffee" />
@@ -105,13 +96,14 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
               </Button>
             </Link>
 
-            {/* Auth */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="hover:bg-accent/10">
-                    <User className="h-5 w-5 text-coffee" />
-                  </Button>
+                  {!isMobile && (
+                    <Button variant="ghost" size="sm" className="hover:bg-accent/10">
+                      <User className="h-5 w-5 text-coffee" />
+                    </Button>
+                  )}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
@@ -135,7 +127,6 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
               )
             )}
 
-            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="sm"
@@ -151,7 +142,6 @@ export const Header = ({ onSearchChange, searchQuery, children }: HeaderProps) =
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/50">
             <nav className="flex flex-col space-y-3">

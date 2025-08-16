@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/layout/Header';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/components/ui/use-toast';
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart, loading: cartLoading } = useCart();
@@ -15,40 +14,17 @@ export const Cart = () => {
   const navigate = useNavigate();
   const [isClearing, setIsClearing] = useState(false);
 
-  if (cartLoading || authLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
-          <p className="text-muted-foreground font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Recalculate order summary
   const subtotal = getCartTotal();
   const taxRate = 0.08;
   const deliveryFee = subtotal > 25 ? 0 : 2.99;
   const taxAmount = subtotal * taxRate;
   const total = subtotal + taxAmount + deliveryFee;
 
-  const handleRemoveItem = (itemId: string, itemName: string) => {
-    removeFromCart(itemId);
-    toast({
-      title: 'Item removed',
-      description: `${itemName} has been removed from your cart.`,
-    });
-  };
-
   const handleClearCart = async () => {
     setIsClearing(true);
     try {
       await clearCart();
-      toast({
-        title: 'Cart cleared',
-        description: 'All items have been removed from your cart.',
-      });
     } finally {
       setIsClearing(false);
     }
@@ -62,6 +38,18 @@ export const Cart = () => {
     }
     navigate('/checkout');
   };
+
+  if (cartLoading || authLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4" />
+          <p className="text-muted-foreground font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -98,7 +86,6 @@ export const Cart = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 pt-6 pb-12">
-        {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
@@ -124,26 +111,33 @@ export const Cart = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map(item => (
-              <Card key={item.id} className="coffee-card shadow-coffee">
+            {cartItems.map((item) => (
+              <Card key={item.id} className="shadow-coffee">
                 <CardContent className="p-6 flex items-center space-x-4">
-                  {/* Image */}
                   <div className="flex-shrink-0">
                     <div className="w-20 h-20 bg-gradient-card rounded-lg flex items-center justify-center">
                       {item.menu_item?.image_url ? (
                         <img
                           src={item.menu_item.image_url}
                           alt={item.menu_item.name}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full h-full object-cover rounded-lg coffee-card"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling!.style.display = 'flex';
+                          }}
                         />
                       ) : (
                         <span className="text-2xl opacity-50">🍽️</span>
                       )}
+                      <span
+                        className="text-2xl opacity-50"
+                        style={{ display: 'none' }}
+                      >
+                        🍽️
+                      </span>
                     </div>
                   </div>
-                  {/* Details */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display text-lg font-semibold text-coffee">
                       {item.menu_item?.name}
@@ -160,7 +154,6 @@ export const Cart = () => {
                       </p>
                     )}
                   </div>
-                  {/* Quantity Controls */}
                   <div className="flex items-center space-x-3">
                     <Button
                       variant="outline"
@@ -183,30 +176,29 @@ export const Cart = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveItem(item.id, item.menu_item?.name)}
+                      onClick={() => removeFromCart(item.id)}
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
-                  {/* Item Total */}
                   <div className="hidden lg:block text-right min-w-0">
-                    <p className="font-display font-bold text-gold">
-                      <p className='text-coffee'>Item Total:</p>${(item.menu_item?.price * item.quantity).toFixed(2)}
-                    </p>
+                    <div className="font-display font-bold text-gold">
+                      <span className="text-coffee">Item Total: </span>
+                      ${(item.menu_item?.price * item.quantity).toFixed(2)}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Order Summary */}
           <div className="lg:col-span-1">
             <Card className="coffee-card sticky top-24 shadow-coffee">
               <CardContent className="p-6 space-y-4">
                 <h2 className="font-display text-xl font-semibold text-coffee">Order Summary</h2>
                 <div className="space-y-2">
-                  {cartItems.map(item => (
+                  {cartItems.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         {item.menu_item?.name} × {item.quantity}

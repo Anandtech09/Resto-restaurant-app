@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, MapPin, Clock, Gift, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { CreditCard, MapPin, Clock, Gift, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,23 @@ import { toast } from '@/components/ui/use-toast';
 import { useCart } from '@/hooks/useCart';
 import { Header } from '@/components/layout/Header';
 import { Offer } from '@/types';
+
+interface OrderSuccessData {
+  orderNumber: string;
+  total: number;
+  subtotal: number;
+  taxAmount: number;
+  deliveryFee: number;
+  discountAmount: number;
+  appliedOfferCode?: string;
+  items: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+    totalPrice: number;
+  }>;
+}
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -31,7 +48,7 @@ export const Checkout = () => {
   const [appliedOffer, setAppliedOffer] = useState<Offer | null>(null);
   const [applyingOffer, setApplyingOffer] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: string; total: number } | null>(null);
+  const [orderSuccess, setOrderSuccess] = useState<OrderSuccessData | null>(null);
 
   const subtotal = cart.reduce((sum, item) => sum + ((item.menu_item?.price || 0) * item.quantity), 0);
   const taxRate = 0.08;
@@ -134,7 +151,6 @@ export const Checkout = () => {
         });
         return false;
       }
-      // Basic format validation (can be enhanced with regex)
       if (creditCardDetails.number.length < 12 || creditCardDetails.cvv.length < 3) {
         toast({
           title: 'Invalid Card Details',
@@ -176,12 +192,32 @@ export const Checkout = () => {
     if (!validatePaymentDetails()) {
       return;
     }
+    
     setLoading(true);
     try {
       const selectedAddr = addresses.find(addr => addr.id === selectedAddress);
       if (!selectedAddr) throw new Error('Selected address not found');
 
       const { data: orderNumber } = await supabase.rpc('generate_order_number');
+      
+      // Store order success data BEFORE clearing cart and resetting state
+      const orderSuccessData: OrderSuccessData = {
+        orderNumber,
+        total,
+        subtotal,
+        taxAmount,
+        deliveryFee,
+        discountAmount,
+        appliedOfferCode: appliedOffer?.code,
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.menu_item?.name || 'Unknown Item',
+          quantity: item.quantity,
+          price: item.menu_item?.price || 0,
+          totalPrice: (item.menu_item?.price || 0) * item.quantity,
+        })),
+      };
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([
@@ -232,8 +268,10 @@ export const Checkout = () => {
           .eq('id', appliedOffer.id);
       }
 
+      // Clear cart and set success data
       clearCart();
-      setOrderSuccess({ orderNumber, total });
+      setOrderSuccess(orderSuccessData);
+      
       toast({
         title: 'Order Placed!',
         description: `Your order #${orderNumber} has been placed successfully`,
@@ -268,33 +306,35 @@ export const Checkout = () => {
                 </p>
                 <div className="space-y-2 text-left">
                   <p className="text-sm font-medium">Order Details:</p>
-                  {cart.map(item => (
+                  {orderSuccess.items.map(item => (
                     <div key={item.id} className="text-sm text-muted-foreground">
-                      <span>{item.menu_item?.name} × {item.quantity}</span>
-                      <span className="float-right">${((item.menu_item?.price || 0) * item.quantity).toFixed(2)}</span>
+                      <span>{item.name} × {item.quantity}</span>
+                      <span className="float-right">${item.totalPrice.toFixed(2)}</span>
                     </div>
                   ))}
-                  {appliedOffer && (
+                  <Separator className="my-2" />
+                  <div className="text-sm">
+                    <span>Subtotal</span>
+                    <span className="float-right">${orderSuccess.subtotal.toFixed(2)}</span>
+                  </div>
+                  {orderSuccess.discountAmount > 0 && (
                     <div className="text-sm text-green-600">
-                      <span>Discount ({appliedOffer.code})</span>
-                      <span className="float-right">-${discountAmount.toFixed(2)}</span>
+                      <span>Discount ({orderSuccess.appliedOfferCode})</span>
+                      <span className="float-right">-${orderSuccess.discountAmount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="text-sm">
-                    <span>Subtotal</span>
-                    <span className="float-right">${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="text-sm">
                     <span>Tax (8%)</span>
-                    <span className="float-right">${taxAmount.toFixed(2)}</span>
+                    <span className="float-right">${orderSuccess.taxAmount.toFixed(2)}</span>
                   </div>
                   <div className="text-sm">
                     <span>Delivery Fee</span>
-                    <span className="float-right">{deliveryFee === 0 ? 'FREE' : `$${deliveryFee.toFixed(2)}`}</span>
+                    <span className="float-right">{orderSuccess.deliveryFee === 0 ? 'FREE' : `$${orderSuccess.deliveryFee.toFixed(2)}`}</span>
                   </div>
+                  <Separator className="my-2" />
                   <div className="text-sm font-bold text-coffee">
                     <span>Total</span>
-                    <span className="float-right">${total.toFixed(2)}</span>
+                    <span className="float-right">${orderSuccess.total.toFixed(2)}</span>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -336,30 +376,41 @@ export const Checkout = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
-                    {addresses.map(address => (
-                      <div
-                        key={address.id}
-                        className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-accent/5 transition-colors"
+                  {addresses.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-muted-foreground">No addresses found. Please add one in your profile.</p>
+                      <Button
+                        variant="outline"
+                        className="mt-2"
+                        onClick={() => navigate('/profile')}
                       >
-                        <RadioGroupItem value={address.id} id={address.id} />
-                        <div className="flex-1">
-                          <label htmlFor={address.id} className="cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              Email:{address.label && <p>{address.label}</p>}
-                              {address.is_default && <Badge className="bg-gold text-coffee">Default</Badge>}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              Street Address: <p className="font-medium">{address.street_address}</p>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              City/Country: {address.city}, {address.state} {address.zip_code}
-                            </p>
-                          </label>
+                        Add Address
+                      </Button>
+                    </div>
+                  ) : (
+                    <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
+                      {addresses.map(address => (
+                        <div
+                          key={address.id}
+                          className="flex items-start space-x-3 p-4 border border-border rounded-lg hover:bg-accent/5 transition-colors mb-2"
+                        >
+                          <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+                          <div className="flex-1">
+                            <label htmlFor={address.id} className="cursor-pointer">
+                              <div className="flex items-center gap-2 mb-1">
+                                {address.label && <p className="font-medium">{address.label}</p>}
+                                {address.is_default && <Badge className="bg-gold text-coffee">Default</Badge>}
+                              </div>
+                              <p className="text-sm font-medium">{address.street_address}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {address.city}, {address.state} {address.zip_code}
+                              </p>
+                            </label>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                      ))}
+                    </RadioGroup>
+                  )}
                 </CardContent>
               </Card>
 

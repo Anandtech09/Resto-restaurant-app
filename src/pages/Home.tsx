@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChefHat, Clock, Truck, Search, ArrowRight, X } from 'lucide-react';
+import { Search, ArrowRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { MenuItem, MenuCategory, Offer } from '@/types';
 import { MenuCard } from '@/components/menu/MenuCard';
@@ -35,7 +34,6 @@ export const Home = () => {
     fetchData();
   }, []);
 
-  // Scroll to "Browse Our Menu" when search is opened or searchQuery changes
   useEffect(() => {
     if (isSearchOpen) {
       const browseMenuSection = document.getElementById('browse-menu');
@@ -112,7 +110,6 @@ export const Home = () => {
         </Button>
       </Header>
 
-      {/* Search Box Centered on Screen */}
       {isSearchOpen && (
         <div className="fixed inset-x-0 top-20 z-50 flex items-center justify-center px-4">
           <div className="w-full max-w-md relative">
@@ -138,7 +135,6 @@ export const Home = () => {
       )}
 
       <main className="flex-grow">
-        {/* Hero Section */}
         {!isSearchOpen && (
           <section
             className="relative h-[calc(100vh-1rem)] flex items-center justify-center overflow-hidden"
@@ -171,7 +167,7 @@ export const Home = () => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="border-primary-foreground/30 text-white bg-coffee"
+                      className="border-primary-foreground/30 text-white bg-coffee "
                     >
                       View Menu
                     </Button>
@@ -187,7 +183,6 @@ export const Home = () => {
           </section>
         )}
 
-        {/* Current Offers */}
         {!isSearchOpen && offers.length > 0 && (
           <section className="py-20 coffee-texture">
             <div className="container mx-auto px-4">
@@ -205,13 +200,10 @@ export const Home = () => {
                     className="bg-gradient-warm text-coffee overflow-hidden shadow-coffee relative w-full max-w-sm mx-auto transform transition-all duration-300 hover:scale-105"
                   >
                     <CardContent className="p-6 text-center flex flex-col items-center relative z-10">
-                      {/* Ticket Top Section (Logo/Brand Placeholder) */}
                       <div className="absolute top-2 left-2 text-sm text-white font-inter bg-coffee-light/80 px-2 py-1 rounded-md">
                         Resto.
                       </div>
-
-                      {/* Main Offer Value */}
-                      <h2 className="font-display text-3xl font-bold text-coffee-dark mb-2 mt-6">
+                      <h2 className="font-display text-3xl font-bold text-coffee-dark mb-2 mt-6 animate-steam">
                         {offer.discount_type === 'percentage'
                           ? `${offer.discount_value}% OFF`
                           : `$${offer.discount_value} OFF`}
@@ -219,31 +211,21 @@ export const Home = () => {
                       <p className="text-muted-foreground text-sm mb-4">
                         When you spend ${offer.min_order_amount}
                       </p>
-
-                      {/* Ticket Body (Perforated Effect) */}
                       <div className="w-full h-px bg-coffee/20 my-4 relative">
                         <div className="absolute inset-x-0 top-1/2 h-1 bg-gradient-to-r from-transparent via-coffee-light/50 to-transparent opacity-50" />
                       </div>
-
-                      {/* Ticket Details */}
                       <div className="bg-coffee/20 p-4 rounded-lg shadow-inner w-full">
                         <h3 className="font-display text-lg font-semibold mb-2">{offer.title}</h3>
                         <p className="text-muted-foreground text-sm mb-2">{offer.description}</p>
                         <p className="text-sm text-muted-foreground">Min order: ${offer.min_order_amount}</p>
                       </div>
-
-                      {/* Scratch Card Section */}
                       <div className="w-full flex justify-center">
                         <ScratchCard code={offer.code} />
                       </div>
-
-                      {/* Ticket Bottom Section */}
                       <div className="w-full text-left mt-4 text-sm text-muted-foreground">
                         Free offer for you!
                       </div>
                     </CardContent>
-
-                    {/* Ticket Shape with Clipped Corners and Perforated Edges */}
                     <div className="absolute inset-0 border-2 border-coffee-dark/20 rounded-lg overflow-hidden">
                       <div className="absolute top-0 left-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 0 100%)" />
                       <div className="absolute top-0 right-0 w-4 h-4 bg-gradient-warm clip-path-polygon(0 0, 100% 0, 100% 100%)" />
@@ -259,7 +241,6 @@ export const Home = () => {
           </section>
         )}
 
-        {/* Today's Specials */}
         {!isSearchOpen && specialItems.length > 0 && (
           <section className="py-20 bg-gradient-warm">
             <div className="container mx-auto px-4">
@@ -279,7 +260,6 @@ export const Home = () => {
           </section>
         )}
 
-        {/* Browse Our Menu (Always Visible, Scrolls to Top When Search is Open) */}
         <section id="browse-menu" className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -315,7 +295,6 @@ export const Home = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
         {!isSearchOpen && (
           <section className="py-20 hero-gradient text-primary-foreground">
             <div className="container mx-auto px-4 text-center">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Save, X, Package, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Package, Tag, ShoppingCart, Gift, Menu, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -333,7 +333,6 @@ export const Admin = () => {
     }
   };
 
-
   if (loading || authLoading) {
     if (showError) {
       return (
@@ -373,12 +372,36 @@ export const Admin = () => {
       <div className="container mx-auto px-4">
         <h1 className="font-display mt-3 text-4xl font-bold text-coffee mb-6 animate-fade-up">Admin Panel</h1>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-gradient-card shadow-coffee">
-            <TabsTrigger value="orders" className="font-display text-coffee">Order Management</TabsTrigger>
-            <TabsTrigger value="offers" className="font-display text-coffee">Offer Management</TabsTrigger>
-            <TabsTrigger value="menu" className="font-display text-coffee">Menu Management</TabsTrigger>
-            <TabsTrigger value="banner" className="font-display text-coffee">Banner Settings</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 mb-4">
+          <TabsList className="grid w-full grid-cols-4 bg-background rounded-lg overflow-hidden md:p-2">
+            <TabsTrigger
+              value="orders"
+              className="font-display text-coffee flex flex-row items-center justify-center gap-1 py-3 px-2 md:px-4 md:py-2 min-w-0 rounded-md data-[state=active]:bg-gold data-[state=active]:shadow-none data-[state=active]:m-0.5"
+            >
+              <ShoppingCart className="h-4 w-4 flex-shrink-0 border-none outline-none transform translate-z-0" />
+              <span className="hidden sm:inline text-xs truncate">Orders</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="offers"
+              className="font-display text-coffee flex flex-row items-center justify-center gap-1 py-3 px-2 md:px-4 md:py-2 min-w-0 rounded-md data-[state=active]:bg-gold data-[state=active]:shadow-none data-[state=active]:m-0.5"
+            >
+              <Gift className="h-4 w-4 flex-shrink-0 border-none outline-none transform translate-z-0" />
+              <span className="hidden sm:inline text-xs truncate">Offers</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="menu"
+              className="font-display text-coffee flex flex-row items-center justify-center gap-1 py-3 px-2 md:px-4 md:py-2 min-w-0 rounded-md data-[state=active]:bg-gold data-[state=active]:shadow-none data-[state=active]:m-0.5"
+            >
+              <Menu className="h-4 w-4 flex-shrink-0 border-none outline-none transform translate-z-0" />
+              <span className="hidden sm:inline text-xs truncate">Menu</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="banner"
+              className="font-display text-coffee flex flex-row items-center justify-center gap-1 py-3 px-2 md:px-4 md:py-2 min-w-0 rounded-md data-[state=active]:bg-gold data-[state=active]:shadow-none data-[state=active]:m-0.5"
+            >
+              <Settings className="h-4 w-4 flex-shrink-0 border-none outline-none transform translate-z-0" />
+              <span className="hidden sm:inline text-xs truncate">Banner</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders" className="space-y-6">
@@ -451,7 +474,7 @@ export const Admin = () => {
                     <p className="font-display">No orders found.</p>
                     <p className="text-sm">May this issue occured that you not set your address in profile</p>
                     <p className="text-sm">Please set your address in profile</p>
-                    <button className='text-sm text-coffee hover:underline' onClick={() => router.push('/profile')}>Set Address</button>
+                    <button className='text-sm text-coffee hover:underline' onClick={() => navigate('/profile')}>Set Address</button>
                   </div>
                 )}
               </CardContent>
@@ -593,39 +616,56 @@ export const Admin = () => {
                 <div className="space-y-4">
                   {offers.length > 0 ? (
                     offers.map(offer => (
-                      <div key={offer.id} className="border border-gold p-4 rounded-lg flex justify-between items-center bg-gradient-card">
-                        <div>
-                          <p className="font-display font-bold text-lg text-coffee flex items-center gap-2">
-                            {offer.title} <Badge className="bg-gold text-coffee">{offer.code}</Badge>
-                            {offer.is_active ? (
-                              <Badge className="bg-green-600 text-white">Active</Badge>
-                            ) : (
-                              <Badge variant="secondary">Inactive</Badge>
-                            )}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{offer.description}</p>
-                          <p className="text-sm font-display text-coffee">
-                            Discount: <strong>{offer.discount_type === 'percentage' ? `${offer.discount_value}%` : `$${offer.discount_value}`}</strong> on orders over ${offer.min_order_amount}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Valid: {new Date(offer.valid_from).toLocaleDateString()} to {new Date(offer.valid_until).toLocaleDateString()}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Usage: {offer.used_count} / {offer.usage_limit || '∞'}
-                          </p>
+                      <div key={offer.id} className="border border-gold p-4 rounded-lg bg-gradient-card">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                          <div className="flex-1 space-y-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-display font-bold text-lg text-coffee">{offer.title}</h3>
+                              <Badge className="bg-gold text-coffee text-xs">{offer.code}</Badge>
+                              {offer.is_active ? (
+                                <Badge className="bg-green-600 text-white text-xs">Active</Badge>
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                              )}
+                            </div>
+                            
+                            <p className="text-sm text-muted-foreground line-clamp-2">{offer.description}</p>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                              <p className="font-display text-coffee">
+                                <strong>Discount:</strong> {offer.discount_type === 'percentage' ? `${offer.discount_value}%` : `$${offer.discount_value}`}
+                              </p>
+                              <p className="font-display text-coffee">
+                                <strong>Min. Order:</strong> ${offer.min_order_amount}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                <strong>Valid:</strong> {new Date(offer.valid_from).toLocaleDateString()} to {new Date(offer.valid_until).toLocaleDateString()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                <strong>Usage:</strong> {offer.used_count} / {offer.usage_limit || '∞'}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex lg:flex-col gap-2">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteOffer(offer.id)}
+                              className="hover:bg-destructive/80 flex items-center gap-1"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="lg:hidden">Delete</span>
+                            </Button>
+                          </div>
                         </div>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => handleDeleteOffer(offer.id)}
-                          className="hover:bg-destructive/80"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted-foreground text-center font-display">No offers found.</p>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Gift className="h-12 w-12 mx-auto mb-4" />
+                      <p className="font-display">No offers found.</p>
+                    </div>
                   )}
                 </div>
               </CardContent>
